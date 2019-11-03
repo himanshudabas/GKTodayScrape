@@ -1,1 +1,1 @@
-0 0 * * * ~/gktoday/env/bin/python ~/gktoday/scraping/gktoday_scraping.py >> ~/gktoday/log/cron.log 2>&1
+0 */4 * * * ~/gktoday/env/bin/python ~/gktoday/scraping/gktoday_scraping.py >> ~/gktoday/log/cron.log 2>&1
