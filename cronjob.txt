@@ -1,1 +1,4 @@
-0 */4 * * * ~/gktoday/env/bin/python ~/gktoday/scraping/gktoday_scraping.py >> ~/gktoday/log/cron.log 2>&1
+# this cronjob will scrape the website every 4 hours and convert the docx file to pdf if a new article is sound
+# It's better if you use a virtual environment to run the script
+
+0 */4 * * * ~/gktoday/env/bin/python ~/gktoday/scrape.py >> ~/gktoday/log/cron.log 2>&1
