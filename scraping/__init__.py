@@ -34,7 +34,6 @@ MAGAZINE_LOG_PATH = '~/gktoday/log/magazine/'
 magazine_folder = "~/gktoday/magazine/"
 
 app_folder = "~/gktoday/telebot/"
-APP_LOG_PATH = '~/gktoday/log/app/'
-__all__ = ['APP_LOG_PATH', 'docxToPDF', 'gk_utils', 'QUIZ_LOG_PATH', 'docx_folder', 'pdf_folder', 'product_url', 'main_page_json',
+__all__ = ['docxToPDF', 'gk_utils', 'QUIZ_LOG_PATH', 'docx_folder', 'pdf_folder', 'product_url', 'main_page_json',
            'main_page_url', 'quiz_data_url', 'quiz_folder', 'monthly_folder', 'fortnight_folder', 'upsc_prelims_folder',
            'month_map', 'main_page', 'MAGAZINE_LOG_PATH', 'magazine_folder', 'app_folder']

@@ -9,8 +9,8 @@ from datetime import datetime as dttm
 import telegram
 from flask import Flask, request
 from telebot.credentials import bot_token, URL, owner_username
-from scraping import APP_LOG_PATH
 from scraping import app_folder
+from telebot import APP_LOG_PATH, bot_welcome_msg, text_msg, send_file_msg
 
 all_users = {}
 LOG_PATH = os.path.expanduser(APP_LOG_PATH)
@@ -60,21 +60,33 @@ def make_keyboard(data):
 # write data to the file
 def write_data(path, data):
     try:
+        logging.debug("Writing data to disk")
         os.makedirs(BOT_FOLDER, exist_ok=True)
         f = open(path, "w")
         f.write(data)
         f.close()
+        logging.debug("Finished writing data to disk")
 
     except Exception:
         logging.info("Error occurred in write_data() at")
         raise
 
 
+# this will remove the most recent call of a user from their user state
+def remove_last_user_state(chat_id):
+    global user_state
+    logging.debug("[remove_last_user_state] removing last user state. i.e.: " + user_state[str(chat_id)][-1])
+    user_state[str(chat_id)] = user_state[str(chat_id)][:-1]
+    logging.debug("[remove_last_user_state] removed last user state.")
+
 # this will write the user state to a file every 20 minutes
 def write_user_state():
     global user_state
-    time.sleep(120)
-    write_data(GKTODAY_TELEBOT_USER_STATE, json.dumps(user_state))
+    while True:
+        logging.debug("[user_state] Writing to disk")
+        time.sleep(120)
+        write_data(GKTODAY_TELEBOT_USER_STATE, json.dumps(user_state))
+        logging.debug("[user_state] Finished writing data to disk")
 
 
 # initialize the daily_quiz_metadata dictionary
@@ -173,9 +185,18 @@ def send_message(_bot, _chat_id, text: str, **kwargs):
 
 # this function will return a string which will be used
 def update_user_state(chat_id, text):
+    logging.debug("[update_user_state] chat id: "+ str(chat_id) + ". text: "+ text)
+    global user_state
     user_state[str(chat_id)].append(text)
-    pass
+    logging.debug("after updating user state: " + " > ".join(user_state[str(chat_id)]))
+    logging.debug("[update_user_state] Exiting chat id: "+ str(chat_id) + ". text: "+ text)
 
+# whis function will empty the user state of the user with chat_id
+def empty_current_user_state(chat_id):
+    global user_state
+    logging.debug("[empty_current_user_state] chat id: "+ str(chat_id))
+    user_state[str(chat_id)] = []
+    logging.debug("[empty_current_user_state] Exiting chat id: "+ str(chat_id))
 
 # function to search the app_metadata and return the appropriate data
 # RETURN:
@@ -276,7 +297,7 @@ def send_broadcast_wrapper(chat_id, text):
     all_user_chat_ids = []
 
     for cur_id, user_details in all_users.items():
-        if user_details['username'] != owner_username:
+        if user_details['username'] != "BaapuJi":
             try:
                 if not user_details['blocked']:
                     all_user_chat_ids.append(cur_id)
@@ -296,7 +317,7 @@ def send_main_menu(chat_id, user_name):
     Please select Quiz or Magazine
     """
     # send the custom keyboard with available years as option
-    user_state[str(chat_id)] = []
+    empty_current_user_state(chat_id)
     update_user_state(chat_id, "/menu")
     custom_keyboard = make_keyboard(['Quiz', 'Magazine'])
     reply_markup = telegram.ReplyKeyboardMarkup(custom_keyboard)
@@ -309,14 +330,10 @@ def send_main_menu(chat_id, user_name):
 # start menu for first time users
 def send_start_menu(chat_id, user_name):
     # initialize the welcoming message
-    bot_welcome = """
-    Welcome to GK Today Quiz bot, here you can get the Monthly Quiz & Magazines from GK Today. :)
-    Notice : GKToday has stopped uploading daily quizzes on their website, so I am unable to compile
-    the PDF for Daily Quiz. Although Magazine without Quiz is available and Updated Daily.
-    """
+    start_msg = bot_welcome_msg.format(owner_username.lower())
     # send the welcoming message
     try:
-        bot.sendMessage(chat_id=chat_id, text=bot_welcome)
+        bot.sendMessage(chat_id=chat_id, text=start_msg, parse_mode=telegram.ParseMode.MARKDOWN_V2)
     except telegram.error.Unauthorized:
         logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
     send_main_menu(chat_id, user_name)
@@ -353,9 +370,6 @@ def update_user_details(chat_id, name, user_name, phn_num):
 
 # This function automatically finds the correct menu/file to send and also handles wrong inputs
 def find_and_send_correct_menu(chat_id, user_name, text):
-    text_msg = """
-    Please choose an option\nor click /menu to go to the Main Menu
-    """
     update_user_state(chat_id, text)
     msg_list, is_file = get_next_choice(user_state[str(chat_id)])
 
@@ -369,12 +383,10 @@ def find_and_send_correct_menu(chat_id, user_name, text):
 
     # received a file path, need to send the file to the user
     elif isinstance(msg_list, str) and is_file:
-        menu = """SENDING PDF FILE.\nPlease Wait...
-        click /menu to go to the main menu\nor choose another month to get another file.
-        """
+        remove_last_user_state(chat_id)
         file_path = msg_list
         try:
-            bot.send_message(chat_id=chat_id, text=menu)
+            bot.send_message(chat_id=chat_id, text=send_file_msg)
             bot.send_chat_action(chat_id=chat_id, action=telegram.ChatAction.UPLOAD_DOCUMENT)
             bot.send_document(chat_id=chat_id, document=open(file_path, 'rb'))
 
@@ -393,8 +405,11 @@ make_directories()
 init_metadata()
 maintenance = False
 # this is to set logging to error mode
+# _log_level = logging.DEBUG
 _log_level = logging.INFO
 _log_file_path = LOG_PATH + "app.log"
+if _log_level == 10:
+    _log_file_path = LOG_PATH + "app_debug.log"
 
 logger = logging.getLogger()
 logger.setLevel(_log_level)
@@ -417,17 +432,18 @@ def respond():
     global all_users, user_state
     chat_id = ""
     msg = update.message
+    logging.debug(msg)
     if msg is None:
         msg = update.edited_message
 
     try:
         chat_id = msg.chat.id
     except KeyError:
-        print("error in chatid = msg.chat.product_id::::")
-        print("update::")
-        print(update)
-        print("msg::")
-        print(msg)
+        logging.debug("error in chatid = msg.chat.product_id::::")
+        logging.debug("update::")
+        logging.debug(update)
+        logging.debug("msg::")
+        logging.debug(msg)
 
     # proceed if chat is null
     if chat_id is not None:
@@ -439,7 +455,7 @@ def respond():
             else:
                 text = "/menu"
         except AttributeError as err:
-            print(err)
+            logging.debug(err)
 
         first = msg.from_user.first_name
         last = msg.from_user.last_name
@@ -453,13 +469,15 @@ def respond():
             last = " "
         name = first + " " + last
         user_name = msg.from_user.username
+        if user_name is None:
+            user_name = "_"
 
         global maintenance
 
         # This shows the users of the bot that it is currently under maintenance
         if maintenance and user_name != owner_username:
             msg = "This BOT is currently under maintenance! Please try again later, if the problem persists contact " \
-                  "the owner at @" + owner_username.lower()
+                  "the owner at @baapuji "
             try:
                 bot.sendMessage(chat_id=chat_id, text=msg)
             except telegram.error.Unauthorized:
@@ -475,23 +493,34 @@ def respond():
 
         try:
             if str(chat_id) not in user_state:
-                user_state[str(chat_id)] = []
+                empty_current_user_state(chat_id)
             if all_users[str(chat_id)] is not None:
                 pass
         except KeyError:
             all_users[str(chat_id)] = {}
-            user_state[str(chat_id)] = []
+            empty_current_user_state(chat_id)
             # new user
-            logging.info("[NEW USER]" + str(chat_id))
+            logging.info("[NEW USER] chat id :" + str(chat_id))
 
         # When bot is not under maintenance or if it's under maintenance but owner is sending request
         # Owner can access the bot even when it's under maintenance
         if not maintenance or user_name == owner_username:
             update_user_details(chat_id, name, user_name, phn_num)
             # testing
-            logging.info(user_name + " -> " + name + " -> " + str(chat_id) +  " -> " + text)
-            print(dttm.now(), "->", user_name, "->", name, "->", str(chat_id), "->", text)
-
+            if user_name is None:
+                logging.debug("Username is NONE")
+            if name is None:
+                logging.debug("name is NONE")
+            if chat_id is None:
+                logging.debug("chat_id is NONE")
+            if text is None:
+                logging.debug("text is NONE")
+            try :
+                print(dttm.now(), "->", user_name, "->", name, "->", str(chat_id), "->", text)
+                logging.info(user_name + " -> " + name + " -> " + str(chat_id) +  " -> " + text)
+            except TypeError:
+                logging.info(str(chat_id) + str(msg))
+                raise TypeError
             # when the owner wants to broadcast the a message to all it's active users
             if text.find("/broadcast ") == 0 and user_name == owner_username:
                 send_broadcast_wrapper(chat_id, text)
