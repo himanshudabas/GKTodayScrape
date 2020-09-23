@@ -1,1 +1,4 @@
 telebot/credentials.py
+scraping/__pycache__
+scraping/gk_utility/__pycache__
+.vscode
