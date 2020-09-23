@@ -203,14 +203,14 @@ def update_user_state(chat_id, text):
     global user_state
     user_state[str(chat_id)].append(text)
     logging.debug("after updating user state: " + " > ".join(user_state[str(chat_id)]))
-    logging.debug("[update_user_state] Exiting chat id: "+ str(chat_id) + ". text: "+ text)
+    logging.debug("[update_user_state] Exiting chat id: " + str(chat_id) + ". text: "+ text)
 
 # whis function will empty the user state of the user with chat_id
 def empty_current_user_state(chat_id):
     global user_state
-    logging.debug("[empty_current_user_state] chat id: "+ str(chat_id))
+    logging.debug("[empty_current_user_state] chat id: " + str(chat_id))
     user_state[str(chat_id)] = []
-    logging.debug("[empty_current_user_state] Exiting chat id: "+ str(chat_id))
+    logging.debug("[empty_current_user_state] Exiting chat id: " + str(chat_id))
 
 # function to search the app_metadata and return the appropriate data
 # RETURN:
@@ -338,7 +338,7 @@ def send_main_menu(chat_id, user_name):
     try:
         bot.send_message(chat_id=chat_id, text=choice, reply_markup=reply_markup)
     except telegram.error.Unauthorized:
-        logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+        logging.info("bot is blocked by \nUSERNAME: " +  user_name + "\nCHATID: " + str(chat_id))
 
 
 # start menu for first time users
@@ -349,7 +349,7 @@ def send_start_menu(chat_id, user_name):
     try:
         bot.sendMessage(chat_id=chat_id, text=start_msg, parse_mode=telegram.ParseMode.MARKDOWN_V2)
     except telegram.error.Unauthorized:
-        logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+        logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
     send_main_menu(chat_id, user_name)
 
 
@@ -359,7 +359,7 @@ def send_wrong_input(chat_id, user_name):
     try:
         bot.sendMessage(chat_id=chat_id, text=incorrect)
     except telegram.error.Unauthorized:
-        logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+        logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
 
     send_main_menu(chat_id, user_name)
 
@@ -393,7 +393,7 @@ def find_and_send_correct_menu(chat_id, user_name, text):
         try:
             bot.send_message(chat_id=chat_id, text=text_msg, reply_markup=reply_markup)
         except telegram.error.Unauthorized:
-            logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+            logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
 
     # received a file path, need to send the file to the user
     elif isinstance(msg_list, str) and is_file:
@@ -405,7 +405,7 @@ def find_and_send_correct_menu(chat_id, user_name, text):
             bot.send_document(chat_id=chat_id, document=open(file_path, 'rb'))
 
         except telegram.error.Unauthorized:
-            logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+            logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
         pass
 
     # user selected the wrong option
@@ -495,7 +495,7 @@ def respond():
             try:
                 bot.sendMessage(chat_id=chat_id, text=msg)
             except telegram.error.Unauthorized:
-                logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+                logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
             return 'ok'
 
         # This toggles the maintenance status of the bot
@@ -558,7 +558,7 @@ def respond():
                 try:
                     bot.send_message(chat_id=chat_id, text=msg)
                 except telegram.error.Unauthorized:
-                    logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
+                    logging.info("bot is blocked by \nUSERNAME: " + user_name, "\nCHATID: " + str(chat_id))
                 send_main_menu(chat_id, user_name)
 
             # for all other options that user enters

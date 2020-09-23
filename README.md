@@ -27,7 +27,7 @@ Initialize python virtual environment and activate.
 
 Install the required python libraries.
 
-`(env) >> pip install bs4 requests python-docx`
+`(env) >> pip install bs4 requests python-docx flask python-telegram-bot`
 
 
 ## 2. Run the Script
