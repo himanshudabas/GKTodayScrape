@@ -42,6 +42,7 @@ app_metadata = {}
 # write app_metadata to disk
 def write_app_md_to_disk():
     app_md_path = app_folder + "app_metadata.json"
+    os.makedirs(app_folder, exist_ok=True)
     app_file = open(app_md_path, 'w')
     app_file.write(json.dumps(app_metadata))
     app_file.close()
