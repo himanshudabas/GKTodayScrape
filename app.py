@@ -26,6 +26,20 @@ app_metadata = {}
 user_state = {}  # this is to maintain previous 2 commands of users in order to serve the correct file
 
 
+# occasionally read the app_metadata.json file in case a new file gets updated
+def read_app_metadata_async():
+    global app_metadata
+    while True:
+        logging.debug("[read_app_metadata_async] reading from disk")
+        time.sleep(14400)
+        try:
+            f = open(BOT_FOLDER + "app_metadata.json", "r")
+            app_metadata = json.loads(f.read())
+            f.close()
+        except FileNotFoundError:
+            raise
+        logging.debug("[read_app_metadata_async] Finished reading data to disk")
+
 # initialize the directories
 def make_directories():
     # to create the folder for docx and pdf files if they doesn't exist already
@@ -521,6 +535,7 @@ def respond():
             except TypeError:
                 logging.info(str(chat_id) + str(msg))
                 raise TypeError
+
             # when the owner wants to broadcast the a message to all it's active users
             if text.find("/broadcast ") == 0 and user_name == owner_username:
                 send_broadcast_wrapper(chat_id, text)
@@ -535,6 +550,15 @@ def respond():
 
             # when user request for the main menu
             elif text == "/menu":
+                send_main_menu(chat_id, user_name)
+
+            # when user thanks the Bot
+            elif text.lower().find("thank") != -1:
+                msg = "स्वागतम् ❤️"
+                try:
+                    bot.send_message(chat_id=chat_id, text=msg)
+                except telegram.error.Unauthorized:
+                    logging.info("bot is blocked by \nUSERNAME:", user_name, "\nCHATID: ", str(chat_id))
                 send_main_menu(chat_id, user_name)
 
             # for all other options that user enters
