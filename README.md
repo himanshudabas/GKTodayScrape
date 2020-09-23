@@ -14,13 +14,21 @@ If you are on windows, you need to set add it to the PATH.
 
 ##### 1.2. Setup Python Virtual Environment
 make a folder named gkdoday in home directory.
+
 `>> mkdir ~/gktoday`
+
 `>> cd ~/gktoday`
+
 Initialize python virtual environment and activate.
+
 `>> python3 -m venv env`
+
 `>> source ./env/bin/activate`
+
 Install the required python libraries.
+
 `(env) >> pip install bs4 requests python-docx`
+
 
 ## 2. Run the Script
 `(env) >> python ~/GKTodayScrape/scrape.py`
@@ -34,6 +42,7 @@ Note: Telegram only works over HTTPS if you want to use webhooks. So you need to
 [Running Your Flask Application Over HTTPS](https://blog.miguelgrinberg.com/post/running-your-flask-application-over-https)
 #### 3.3. Run the Flask Server in the background
 `>> nohup ~/gktoday/env/bin/python ~/GKTodayScrape/app.py >> ~/gktoday/log/nohup_app.py.log 2>&1 &`
+
 This will also log the output of nohup in ~/gktoday/log/nohup_app.py.log
 In case something Bad happens, you can check this this log file for errors
 
