@@ -117,11 +117,12 @@ def create_docx_obj(product_id, path, file_name):
                     product_id) + "\nUsing second method to get the required data")
                 question_counter = soup.find('p').decode_contents().strip().split('.')[0]
                 ques = soup.find('p').next_sibling.text.strip().replace('<br/>', "")
-            options = [x[4:] for x in
-                       soup.find('div', {"class": "wp_quiz_question_options"}).decode_contents().strip().split('<br/>')]
+            options = [x[4:].strip() for x in soup.find('div', {"class": "wp_quiz_question_options"}).decode_contents().strip().split('<br/>')]
             exp = soup.find('div', {"class": "exp"}).decode_contents().strip()
             exp = exp.replace("\r", "").strip()
+            exp = exp.replace("<br/>", "\n")
             ans = soup.find("div", {"type": "A"}).next_sibling.text.strip()[8:]
+            ques = ques.replace("<strong>", "").replace("</strong>","")
             docx_data = {
                 'qu': ques,
                 'opt1': options[0],
@@ -457,7 +458,7 @@ def quiz_run(classic=False):
         fetch_product_metadata(classic)
         fetch_all_products(True)
         logging.info("Scraping successful!")
-    except Exception as e:
+    except Exception:
         logging.exception('Error In __main__')
         raise
 

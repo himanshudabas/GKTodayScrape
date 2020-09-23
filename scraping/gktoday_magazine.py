@@ -109,8 +109,6 @@ def add_page_number(run):
 # create front page of the docx file
 def front_page(doc, title, updated_on):
     picture_path = './resources/gktoday_frontpage.jpg'
-    picture_path2 = os.path.expanduser(picture_path)
-    # print(picture_path2)
     p = doc.add_paragraph('')
     front = p.add_run('GKTODAY\n\n\n')
     font = front.font
@@ -189,7 +187,6 @@ def contents_page(year, month, doc, monthly_articles):
         p.add_run("\n")
     p.runs[-1].add_break(docx.enum.text.WD_BREAK.PAGE)
     return 0
-    pass
 
 
 # {
