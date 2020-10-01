@@ -2,8 +2,15 @@
 Python Script to Scrape GKToday Website to create monthly magazines and Quiz PDFs.
 Monthly magazines & Quiz are created in both .docx and .pdf format.
 
+Following are the **screensnaps** of the script and telegram bot. You can see more screensnaps [here](https://github.com/himanshudabas/GKTodayScrape/blob/master/pictures/).
+## Script in Action:
+![Scraping script in action screensnap](https://github.com/himanshudabas/GKTodayScrape/blob/master/pictures/1.fetching_quiz_data.png)
+
+## Telegram Bot serving the scraped files in PDF format
+![Telegram Bot screensnap](https://github.com/himanshudabas/GKTodayScrape/blob/master/pictures/7.telegram_bot.png)
+
 ### NOTE :
-I have tested this script on Windows & Linux. Although I have only setup the Telegram Bot on Linux. You can follow the Guide till Step 2 on Windows. After that the guide is only for Linux.
+I have tested this script on Windows & Linux. Although I have only setup the Telegram Bot on Linux. You can follow the Guide till Step 2 on Windows. Following step 2 is the guide for setting up the Telegram bot, which is only for Linux.
 ## 1. Setup
 ##### Clone the Project in you Home folder
 `>> git clone ~/`
