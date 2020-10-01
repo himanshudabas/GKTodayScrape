@@ -8,6 +8,9 @@ Please choose an option\nor click /menu to go to the Main Menu
 send_file_msg = """SENDING PDF FILE.\nPlease Wait...\n\
 click /menu to go to the main menu\nor choose another month to get another file.
 """
+
+maintenance_msg = "This BOT is currently under maintenance! Please try again later, if the problem persists contact the owner at @{}"
+
 APP_LOG_PATH = '~/gktoday/log/app/'
 
-__all__ = ['bot_welcome_msg', 'APP_LOG_PATH', 'text_msg', 'send_file_msg']
+__all__ = ['maintenance_msg', 'bot_welcome_msg', 'APP_LOG_PATH', 'text_msg', 'send_file_msg']

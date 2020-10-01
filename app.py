@@ -10,7 +10,7 @@ import telegram
 from flask import Flask, request
 from telebot.credentials import bot_token, URL, owner_username
 from scraping import app_folder
-from telebot import APP_LOG_PATH, bot_welcome_msg, text_msg, send_file_msg
+from telebot import APP_LOG_PATH, bot_welcome_msg, text_msg, send_file_msg, maintenance_msg
 
 all_users = {}
 LOG_PATH = os.path.expanduser(APP_LOG_PATH)
@@ -311,7 +311,7 @@ def send_broadcast_wrapper(chat_id, text):
     all_user_chat_ids = []
 
     for cur_id, user_details in all_users.items():
-        if user_details['username'] != "BaapuJi":
+        if user_details['username'] != owner_username:
             try:
                 if not user_details['blocked']:
                     all_user_chat_ids.append(cur_id)
@@ -490,8 +490,7 @@ def respond():
 
         # This shows the users of the bot that it is currently under maintenance
         if maintenance and user_name != owner_username:
-            msg = "This BOT is currently under maintenance! Please try again later, if the problem persists contact " \
-                  "the owner at @baapuji "
+            msg = maintenance_msg.format(owner_username.lower())
             try:
                 bot.sendMessage(chat_id=chat_id, text=msg)
             except telegram.error.Unauthorized:
@@ -587,6 +586,9 @@ def index():
     # open your website (https://example.com/) in the browser
     return 'Server is Working'
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return 'Nothing to see here.', 200
 
 if __name__ == '__main__':
 

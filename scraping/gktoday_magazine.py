@@ -22,8 +22,6 @@ LOG_PATH = os.path.expanduser(LOG_PATH)
 # TO expand the "~/ path"
 magazine_folder = os.path.expanduser(magazine_folder)
 
-os.chdir(os.path.expanduser('~/GKTodayScrape/'))
-
 # this contains data of each article
 daily_articles_metadata = {}
 # this is a temporary list of articles which are fetched from the website. this gets dumped into the daily_articles_json
@@ -110,7 +108,7 @@ def add_page_number(run):
 
 # create front page of the docx file
 def front_page(doc, title, updated_on):
-    picture_path = './resources/gktoday_frontpage.jpg'
+    picture_path = os.path.join(os.path.dirname(__file__), '../resources/gktoday_frontpage.jpg')
     p = doc.add_paragraph('')
     front = p.add_run('GKTODAY\n\n\n')
     font = front.font
