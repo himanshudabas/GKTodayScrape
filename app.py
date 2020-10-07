@@ -31,7 +31,8 @@ def read_app_metadata_async():
     global app_metadata
     while True:
         logging.debug("[read_app_metadata_async] reading from disk")
-        time.sleep(14400)
+        # read metadata every hour to check if some new file has been added
+        time.sleep(3600)
         try:
             f = open(BOT_FOLDER + "app_metadata.json", "r")
             app_metadata = json.loads(f.read())
@@ -432,7 +433,8 @@ file_handler.setLevel(_log_level)
 formatter = logging.Formatter('%(levelname)s:%(asctime)s:%(name)s:%(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
-
+t = threading.Thread(target=read_app_metadata_async)
+t.start()
 x = threading.Thread(target=write_user_state)
 x.start()
 # start the flask app
