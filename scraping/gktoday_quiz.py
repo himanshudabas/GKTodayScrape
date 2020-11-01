@@ -1,10 +1,11 @@
 import json
+import sys
 import logging
 import os
-from datetime import datetime as dttm
-
 import docx
 import requests
+
+from datetime import datetime as dttm
 from bs4 import BeautifulSoup
 from docx.shared import Pt
 
@@ -148,7 +149,7 @@ def fetch_product(product_id):
     res = requests.get(url=fetch_url, headers=req_head)
     if res.status_code != 200:
         # error
-        raise Exception("Status code" + str(res.status_code))
+        raise Exception("Status code " + str(res.status_code))
 
     return json.loads(res.text)['content']['rendered']
 
@@ -443,12 +444,15 @@ def fetch_product_metadata(classic=False):
 def quiz_run(classic=False):
     try:
         # initialize metadata
+        args = sys.argv
         init_metadata()
         _log_level = logging.INFO
+        if len(args) > 1 and args[1] == '--debug':
+            _log_level = logging.DEBUG
         _log_file_path = LOG_PATH + "scraping_quiz.log"
-
         logger = logging.getLogger()
         logger.setLevel(_log_level)
+        logger.debug('classis : %s', classic)
         file_handler = logging.FileHandler(_log_file_path)
         file_handler.setLevel(_log_level)
         formatter = logging.Formatter('%(levelname)s:%(asctime)s:%(name)s:%(message)s')
@@ -464,4 +468,4 @@ def quiz_run(classic=False):
 
 
 if __name__ == "__main__":
-    quiz_run()
+    quiz_run(classic=True)
