@@ -3,3 +3,5 @@ scraping/__pycache__
 scraping/gk_utility/__pycache__
 telebot/__pycache__
 .vscode
+*.pyc
+
